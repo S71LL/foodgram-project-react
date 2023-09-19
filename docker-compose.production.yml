@@ -27,7 +27,7 @@ services:
     image: s71ll/foodgram-project-react_gateway
     env_file: .env
     ports:
-      - 9000:80
+      - 8000:80
     volumes:
       - static:/staticfiles/
       - media:/app/media
