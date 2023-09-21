@@ -3,7 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', default='')
+SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-&4$yv0not1t*#l0$#f^_y#661vj26d!ag@%ajnic#7$izy#l$f')
 
 DEBUG = os.getenv('DEBUG', default=False)
 
@@ -100,6 +100,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'recipes.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

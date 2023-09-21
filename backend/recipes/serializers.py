@@ -1,10 +1,10 @@
 import base64
 
 from django.core.files.base import ContentFile
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from recipes.models import (Recipe,
+from recipes.models import (User,
+                            Recipe,
                             Ingredient,
                             Tag,
                             RecipeIngredient,
@@ -12,8 +12,6 @@ from recipes.models import (Recipe,
                             ShoppingCart,
                             )
 from core.services import create_recipe_ingredient
-
-User = get_user_model()
 
 
 class Base64ImageField(serializers.ImageField):
@@ -254,12 +252,8 @@ class FollowingSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
-    )
-    recipe = serializers.PrimaryKeyRelatedField(
-        queryset=Recipe.objects.all()
-    )
+    user = serializers.ReadOnlyField()
+    recipe = serializers.ReadOnlyField()
 
     class Meta:
         model = Favorite
@@ -271,12 +265,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
-    )
-    recipe = serializers.PrimaryKeyRelatedField(
-        queryset=Recipe.objects.all()
-    )
+    user = serializers.ReadOnlyField()
+    recipe = serializers.ReadOnlyField()
 
     class Meta:
         model = ShoppingCart

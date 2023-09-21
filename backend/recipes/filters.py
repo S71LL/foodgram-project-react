@@ -1,20 +1,20 @@
 from django_filters import rest_framework as filters
-from django.contrib.auth import get_user_model
-from rest_framework.filters import SearchFilter
 
-from .models import Tag, Recipe
+from .models import Tag, Recipe, Ingredient
 
 
-User = get_user_model()
+class IngredientFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='startswith')
 
-
-class IngredientFilter(SearchFilter):
-    search_param = 'name'
+    class Meta:
+        model = Ingredient
+        fields = ('name', )
 
 
 class RecipeFilter(filters.FilterSet):
-    tags = filters.AllValuesMultipleFilter(
+    tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
+        to_field_name='slug',
         queryset=Tag.objects.all()
     )
     is_favorited = filters.BooleanFilter(

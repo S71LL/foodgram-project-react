@@ -2,7 +2,6 @@ from rest_framework import viewsets, status
 from django_filters import rest_framework as filters
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.http.response import HttpResponse
@@ -11,7 +10,8 @@ from django.db.models import Sum
 from recipes.models import (Recipe, Ingredient,
                             Tag, Follow,
                             Favorite, ShoppingCart,
-                            RecipeIngredient)
+                            RecipeIngredient,
+                            User)
 from .serializers import (RecipeSerializer,
                           IngredientSerializer,
                           TagSerializer,
@@ -27,9 +27,6 @@ from .serializers import (RecipeSerializer,
 from .permissions import AuthorOrReadOnly
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import CustomPaginator
-
-
-User = get_user_model()
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -59,10 +56,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         if request.method == 'POST':
-            serializer = FavoriteSerializer(recipe, data=request.data,
+            serializer = FavoriteSerializer(data=request.data,
                                             context={'request': request})
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            serializer.save(user=request.user, recipe=recipe)
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
         get_object_or_404(Favorite, user=request.user,
@@ -74,10 +71,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         if request.method == 'POST':
-            serializer = ShoppingCartSerializer(recipe, data=request.data,
+            serializer = ShoppingCartSerializer(data=request.data,
                                                 context={'request': request})
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            serializer.save(user=request.user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         get_object_or_404(ShoppingCart, user=request.user,
                           recipe=recipe).delete()
@@ -155,8 +152,7 @@ class CustomUserViesSet(viewsets.ModelViewSet):
             serializer = FollowAuthorSerializer(author, data=request.data,
                                                 context={'request': request})
             serializer.is_valid(raise_exception=True)
-            follow = Follow.objects.create(user=request.user,
-                                           author=author)
+            serializer.save(user=request.user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         follow = get_object_or_404(Follow,
                                    user=request.user, author=author)
