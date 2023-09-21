@@ -10,6 +10,7 @@ from recipes.models import (User,
                             RecipeIngredient,
                             Favorite,
                             ShoppingCart,
+                            Follow
                             )
 from core.services import create_recipe_ingredient
 
@@ -207,7 +208,7 @@ class FollowAuthorSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
+        model = Follow
         fields = ('email', 'id',
                   'username', 'first_name',
                   'last_name', 'is_subscribed')
@@ -216,7 +217,7 @@ class FollowAuthorSerializer(serializers.ModelSerializer):
         if (self.context.get('request')
            and not self.context['request'].user.is_anonymous):
             user = self.context['request'].user
-            return user.follower.filter(author=obj).exists()
+            return user.follower.filter(author=obj.author).exists()
         return False
 
 

@@ -149,7 +149,7 @@ class CustomUserViesSet(viewsets.ModelViewSet):
     def subscribe(self, request, **kwargs):
         author = get_object_or_404(User, id=kwargs['pk'])
         if request.method == 'POST':
-            serializer = FollowAuthorSerializer(author, data=request.data,
+            serializer = FollowAuthorSerializer(data=request.data,
                                                 context={'request': request})
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user, author=author)
