@@ -200,8 +200,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class FollowAuthorSerializer(serializers.ModelSerializer):
-    email = serializers.ReadOnlyField()
-    username = serializers.ReadOnlyField()
+    email = serializers.ReadOnlyField(source='author.email')
+    first_name = serializers.ReadOnlyField(source='author.first_name')
+    last_name = serializers.ReadOnlyField(source='author.last_name')
+    username = serializers.ReadOnlyField(source='author.username')
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
