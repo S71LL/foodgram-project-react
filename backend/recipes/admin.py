@@ -8,6 +8,7 @@ from recipes.models import (Tag,
                             ShoppingCart,
                             Favorite,
                             User)
+from recipes.forms import RecipeForm, RecipeIngredientForm
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -32,6 +33,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
+    form = RecipeForm
     inlines = (RecipeIngredientInline, )
     list_display = ('pk', 'name', 'author', 'in_favorites')
     search_fields = ('name',)
@@ -39,7 +41,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='Раз в избранном')
     def in_favorites(self, obj):
-        return obj.favorite.count()
+        return obj.in_favorites.count()
 
 
 @admin.register(Ingredient)
@@ -50,7 +52,8 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 @admin.register(RecipeIngredient)
-class IngredientRecipeAdmin(admin.ModelAdmin):
+class RecipeIngredientAdmin(admin.ModelAdmin):
+    form = RecipeIngredientForm
     list_display = ('id', 'recipe', 'ingredient', 'amount',)
     list_filter = ('recipe', 'ingredient',)
     search_fields = ('name',)

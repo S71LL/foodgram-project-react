@@ -59,3 +59,5 @@ sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/col
 ```
 
 ## https://https://foodgramproject.myftp.org
+
+[![Main foodgram workflow](https://github.com/S71LL/foodgram-project-react/actions/workflows/main.yml/badge.svg)](https://github.com/S71LL/foodgram-project-react/actions/workflows/main.yml)

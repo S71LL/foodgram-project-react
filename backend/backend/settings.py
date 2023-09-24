@@ -3,9 +3,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', default='')
+SECRET_KEY = os.getenv('SECRET_KEY', default='secret_key_needed')
 
-DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = bool(os.getenv('DEBUG', default=False))
 
 ALLOWED_HOSTS = list(os.getenv('ALLOWED_HOSTS', default='*').split(','))
 
@@ -117,7 +117,7 @@ DJOSER = {
     'SERIALIZERS': {
         'user': 'recipes.serializers.CustomUserSerializer',
         'current_user': 'recipes.serializers.CustomUserSerializer',
-        'user_create': 'recipes.serializers.CustomUserCreateSerializer',
+        'user_create': 'recipes.serializers.CustomUserSerializer',
     },
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],

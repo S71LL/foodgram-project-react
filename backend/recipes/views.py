@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.http.response import HttpResponse
 from django.db.models import Sum
+from djoser.views import UserViewSet
 
 from recipes.models import (Recipe, Ingredient,
                             Tag, Follow,
@@ -15,12 +16,8 @@ from recipes.models import (Recipe, Ingredient,
 from .serializers import (RecipeSerializer,
                           IngredientSerializer,
                           TagSerializer,
-                          RecipeCreateSerializer,
                           FollowAuthorSerializer,
-                          CustomUserCreateSerializer,
-                          CustomUserSerializer,
                           FollowingSerializer,
-                          ChangePasswordSerializer,
                           FavoriteSerializer,
                           ShoppingCartSerializer
                           )
@@ -38,18 +35,11 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all().order_by('-pub_date')
+    serializer_class = RecipeSerializer
     permission_classes = (AuthorOrReadOnly,)
     pagination_class = CustomPaginator
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = RecipeFilter
-
-    def get_serializer_class(self):
-        if self.action == 'create' or 'update':
-            return RecipeCreateSerializer
-        return RecipeSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
 
     @action(detail=True, methods=['POST', 'DELETE'],
             permission_classes=(IsAuthenticated,))
@@ -57,7 +47,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         if request.method == 'POST':
             serializer = FavoriteSerializer(data=request.data,
-                                            context={'request': request})
+                                            context={'request': request,
+                                                     'recipe': recipe},)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user, recipe=recipe)
             return Response(serializer.data,
@@ -72,7 +63,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         if request.method == 'POST':
             serializer = ShoppingCartSerializer(data=request.data,
-                                                context={'request': request})
+                                                context={'request': request,
+                                                         'recipe': recipe})
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -109,37 +101,17 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class CustomUserViesSet(viewsets.ModelViewSet):
+class CustomUserViesSet(UserViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     pagination_class = CustomPaginator
 
-    def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
-            return CustomUserSerializer
-        return CustomUserCreateSerializer
-
-    @action(detail=False, methods=['GET'],
-            permission_classes=(IsAuthenticated,))
-    def me(self, request):
-        serializer = CustomUserSerializer(request.user)
-        return Response(serializer.data,
-                        status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['POST'],
-            permission_classes=(IsAuthenticated,))
-    def set_password(self, request):
-        serializer = ChangePasswordSerializer(request.user, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
     @action(detail=False, methods=['GET'],
             permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
-        queryset = User.objects.filter(
-            following__user=request.user)
-        page = self.paginate_queryset(queryset)
+        page = self.paginate_queryset(
+            User.objects.filter(follower__user=self.request.user)
+        )
         serializer = FollowingSerializer(page, many=True,
                                          context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -147,10 +119,11 @@ class CustomUserViesSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['POST', 'DELETE'],
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, **kwargs):
-        author = get_object_or_404(User, id=kwargs['pk'])
+        author = get_object_or_404(User, id=kwargs['id'])
         if request.method == 'POST':
             serializer = FollowAuthorSerializer(data=request.data,
-                                                context={'request': request})
+                                                context={'request': request,
+                                                         'author': author})
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
