@@ -15,7 +15,6 @@ from recipes.models import (User,
                             Follow
                             )
 
-from recipes.models import RecipeIngredient
 from recipes.validators import tags_validator, ingredients_validator
 from . import constants
 
