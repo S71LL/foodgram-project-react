@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Recipe, RecipeIngredient
+from .models import Recipe
 
 
 class RecipeForm(forms.ModelForm):
@@ -18,25 +18,28 @@ class RecipeForm(forms.ModelForm):
         tags = cleaned_data.get('tags')
 
         fields = [name, text, cooking_time, image, tags]
-
         if not all(field for field in fields):
             raise forms.ValidationError('Недостаточно данных')
 
         return cleaned_data
 
 
-class RecipeIngredientForm(forms.ModelForm):
-
-    class Meta:
-        model = RecipeIngredient
-        fields = '__all__'
+class RecipeIngredientInLineFormSet(forms.models.BaseInlineFormSet):
 
     def clean(self):
-        cleaned_data = super().clean()
-        recipe = cleaned_data.get('recipe')
-        ingredient = cleaned_data.get('ingredient')
-        if RecipeIngredient.objects.filter(recipe=recipe,
-                                           ingredient=ingredient).exists():
-            raise forms.ValidationError(
-                'В этом рецепте уже есть этот ингредиент')
-        return cleaned_data
+        count = 0
+        ingredients = []
+        for form in self.forms:
+            try:
+                if form.cleaned_data:
+                    count += 1
+                    ingredients.append(form.cleaned_data['ingredient'])
+                if form.cleaned_data['DELETE']:
+                    count -= 1
+                if len(ingredients) != len(set(ingredients)):
+                    raise forms.ValidationError(
+                        'В этом рецепте уже есть этот ингредиент')
+            except (AttributeError, KeyError):
+                pass
+        if count < 1:
+            raise forms.ValidationError('Нужен хотя бы один ингредиент')

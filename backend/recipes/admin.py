@@ -8,11 +8,12 @@ from recipes.models import (Tag,
                             ShoppingCart,
                             Favorite,
                             User)
-from recipes.forms import RecipeForm, RecipeIngredientForm
+from recipes.forms import RecipeForm, RecipeIngredientInLineFormSet
 
 
-class RecipeIngredientInline(admin.TabularInline):
+class RecipeIngredientInLine(admin.StackedInline):
     model = RecipeIngredient
+    formset = RecipeIngredientInLineFormSet
     extra = 1
 
 
@@ -34,7 +35,7 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     form = RecipeForm
-    inlines = (RecipeIngredientInline, )
+    inlines = (RecipeIngredientInLine, )
     list_display = ('pk', 'name', 'author', 'in_favorites')
     search_fields = ('name',)
     list_filter = ('name', 'author', 'tags',)
@@ -53,7 +54,6 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(RecipeIngredient)
 class RecipeIngredientAdmin(admin.ModelAdmin):
-    form = RecipeIngredientForm
     list_display = ('id', 'recipe', 'ingredient', 'amount',)
     list_filter = ('recipe', 'ingredient',)
     search_fields = ('name',)

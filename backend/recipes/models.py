@@ -106,6 +106,7 @@ class Recipe(models.Model):
                               verbose_name='Картинка')
 
     class Meta:
+        ordering = ['-pub_date']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
