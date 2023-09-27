@@ -160,7 +160,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         time = self.initial_data.get('cooking_time')
         if (not isinstance(text, str) or not isinstance(name, str)
-           or not time.isdigit()):
+           or not str(time).isdigit()):
             raise ValidationError('Неверное значение поля')
         if (not constants.MIN_COOKING_TIME > int(time)
            and int(time) > constants.MAX_COOKING_TIME):
