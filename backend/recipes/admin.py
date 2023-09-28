@@ -23,6 +23,7 @@ class UserAdmin(admin.ModelAdmin):
                     'last_name', 'email')
     search_fields = ('username', 'email',)
     list_filter = ('username', 'email',)
+    exclude = ('password',)
 
 
 @admin.register(Tag)

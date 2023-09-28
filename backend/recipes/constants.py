@@ -10,4 +10,4 @@ MAX_INGREDIENT_VALUE = 32767
 PAGE_SIZE = 6
 TAGS_SLUG_REGEX = r'^[-a-zA-Z0-9_]+$'
 USERNAME_REGEX = r'^[\w.@+-]'
-COLOR_REGEX = r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+COLOR_REGEX = r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'

@@ -19,7 +19,7 @@ class RecipeForm(forms.ModelForm):
 
         fields = [name, text, cooking_time, image, tags]
         if not all(field for field in fields):
-            raise forms.ValidationError('Недостаточно данных')
+            raise forms.ValidationError('Не все поля рецепта заполненны')
 
         return cleaned_data
 

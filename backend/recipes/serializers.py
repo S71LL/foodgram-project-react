@@ -34,6 +34,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name',
                   'is_subscribed', 'password')
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
     def get_is_subscribed(self, obj):
         if (self.context.get('request')
@@ -154,21 +157,33 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         RecipeIngredient.objects.bulk_create(recipe_ingredient_objs)
 
     def validate(self, data):
-        text = self.initial_data.get('text')
-        name = self.initial_data.get('name')
-        tags = self.initial_data.get('tags')
-        ingredients = self.initial_data.get('ingredients')
-        time = self.initial_data.get('cooking_time')
-        if (not str(time).isdigit() or not isinstance(text, str)
-           or not isinstance(name, str)):
-            raise ValidationError('Неверное значение поля')
-        if (not constants.MIN_COOKING_TIME > int(time)
-           and int(time) > constants.MAX_COOKING_TIME):
-            raise ValidationError('Неверное время приготовления')
+        text = data.get('text')
+        name = data.get('name')
+        tags = data.get('tags')
+        ingredients = data.get('ingredients')
+        try:
+            cooking_time = int(data.get('cooking_time'))
+        except ValueError:
+            raise ValidationError('Время приготовления должно '
+                                  'быть целым числом')
+        if not isinstance(text, str) or not isinstance(name, str):
+            raise ValidationError(
+                'Описание и название рецепта должны быть текстом')
+        if (not constants.MIN_COOKING_TIME > int(cooking_time)
+           and int(cooking_time) > constants.MAX_COOKING_TIME):
+            raise ValidationError('Время приготовления не может быть '
+                                  'меньше 1 или больше 2880')
         if len(name) > constants.NAME_MAX_LENGTH:
             raise ValidationError('Слишком длинное название')
-        if not tags or not ingredients or not text or not name:
-            raise ValidationError('Недостаточно данных')
+        if not tags:
+            raise ValidationError('У рецепта должны быть теги')
+        if not ingredients:
+            raise ValidationError('В рецепте должен быть '
+                                  'хотя бы один ингредиент')
+        if not text:
+            raise ValidationError('У рецепта должно быть описание')
+        if not name:
+            raise ValidationError('У рецепта должно быть название')
         tags_validator(tags, Tag)
         ingredients_validator(ingredients, Ingredient)
         return data
