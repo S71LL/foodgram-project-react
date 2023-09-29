@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import (MaxValueValidator,
                                     MinValueValidator,
                                     RegexValidator)
-from django.db.models import F, Q
 
 from . import constants
 
@@ -121,8 +120,9 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
                                related_name='ingredient',
                                verbose_name='Рецепт')
-    amount = models.PositiveSmallIntegerField(MinValueValidator(
-        constants.MIN_INGREDIENT_VALUE),)
+    amount = models.PositiveSmallIntegerField(
+        verbose_name='Количество',
+        validators=(MinValueValidator(constants.MIN_INGREDIENT_VALUE),))
 
     class Meta:
         verbose_name = 'Количество ингредиента'
@@ -148,8 +148,6 @@ class Follow(models.Model):
                 fields=('user', 'author'),
                 name='unique_following',
             ),
-            models.CheckConstraint(check=~Q(author=F('user')),
-                                   name='You should not following yourself'),
         )
 
     def __str__(self):

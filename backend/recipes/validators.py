@@ -5,7 +5,7 @@ from rest_framework import status
 
 def tags_validator(tags, Tag):
     for tag in tags:
-        if not type(tag) == Tag:
+        if not Tag.objects.filter(id=tag.id).exists():
             return Response('Страница не найдена',
                             status=status.HTTP_404_NOT_FOUND)
 
@@ -22,6 +22,6 @@ def ingredients_validator(ingredients, Ingredient):
     if len(inrgedient_list) != len(set(inrgedient_list)):
         raise ValidationError('Ингредиенты должны быть уникальными')
     for ingredient in inrgedient_list:
-        if not type(ingredient) == Ingredient:
+        if not Ingredient.objects.filter(id=ingredient.id).exists():
             return Response('Страница не найдена',
                             status=status.HTTP_404_NOT_FOUND)

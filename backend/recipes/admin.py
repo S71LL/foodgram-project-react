@@ -8,7 +8,7 @@ from recipes.models import (Tag,
                             ShoppingCart,
                             Favorite,
                             User)
-from recipes.forms import RecipeForm, RecipeIngredientInLineFormSet
+from recipes.forms import RecipeForm, RecipeIngredientInLineFormSet, FollowForm
 
 
 class RecipeIngredientInLine(admin.StackedInline):
@@ -62,6 +62,7 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
+    form = FollowForm
     list_display = ('user', 'author')
     list_filter = ('author',)
     search_fields = ('user',)

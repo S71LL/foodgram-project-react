@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Recipe
+from .models import Recipe, Follow
 
 
 class RecipeForm(forms.ModelForm):
@@ -43,3 +43,15 @@ class RecipeIngredientInLineFormSet(forms.models.BaseInlineFormSet):
                 pass
         if count < 1:
             raise forms.ValidationError('Нужен хотя бы один ингредиент')
+
+
+class FollowForm(forms.ModelForm):
+
+    class Meta:
+        model = Follow
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('author') == cleaned_data.get('user'):
+            raise forms.ValidationError('Нельзя подписываться на самого себя')

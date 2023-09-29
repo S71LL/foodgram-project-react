@@ -1,13 +1,14 @@
 import os
 from pathlib import Path
 
-from .services import get_bool
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='secret_key_needed')
 
-DEBUG = get_bool(os.getenv('DEBUG', default=False))
+if (os.getenv('DEBUG', default=False)).lower() == 'true':
+    DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
 

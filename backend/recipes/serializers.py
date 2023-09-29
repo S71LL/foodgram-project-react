@@ -169,8 +169,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         if not isinstance(text, str) or not isinstance(name, str):
             raise ValidationError(
                 'Описание и название рецепта должны быть текстом')
-        if (not constants.MIN_COOKING_TIME > int(cooking_time)
-           and int(cooking_time) > constants.MAX_COOKING_TIME):
+        if (cooking_time < constants.MIN_COOKING_TIME
+           or cooking_time > constants.MAX_COOKING_TIME):
             raise ValidationError('Время приготовления не может быть '
                                   'меньше 1 или больше 2880')
         if len(name) > constants.NAME_MAX_LENGTH:
