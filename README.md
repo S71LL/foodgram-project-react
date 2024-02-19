@@ -103,8 +103,5 @@ docker compose up
 
 Документация доступна по адресу
 ### http://localhost/api/docs/
-=======
-Проект доступен локально
-## http://localhost
 
 [![Main foodgram workflow](https://github.com/S71LL/foodgram-project-react/actions/workflows/main.yml/badge.svg)](https://github.com/S71LL/foodgram-project-react/actions/workflows/main.yml)
