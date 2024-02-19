@@ -101,7 +101,12 @@ cd infra
 docker compose up
 ```
 
+<<<<<<< HEAD
 Документация доступна по адресу
 ### http://localhost/api/docs/
+=======
+Проект доступен локально
+## http://localhost
+>>>>>>> 4435057bf99eb4267b88eb7896c8c23daf1cec3b
 
 [![Main foodgram workflow](https://github.com/S71LL/foodgram-project-react/actions/workflows/main.yml/badge.svg)](https://github.com/S71LL/foodgram-project-react/actions/workflows/main.yml)
