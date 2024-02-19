@@ -1,16 +1,48 @@
-### Как развернуть проект:
+# Проект Foodgram
 
-Клонировать репозиторий и перейти в него в командной строке:
+### Foodgram - это социальная сеть для обмена рецептами. Реализована возможность регистрации, создания своих рецептов, подписки на пользователей и составления списка покупок по ингредиентам из рецептов в корзине
+
+Для проекта реализован CI/CD. Автоматическое размещение и запуск проекта на удаленном сервере выполняется при пуше в ветку master. Для корректной работы необходимо, чтобы на удаленном сервере в дериктории проетка был файл .env (пример приведен в блоке локально развертки), а также необходимо задать секретные переменные в настройках репозитория на GitHub. Помимо этого на удаленном сервере нужно настроить nginx
+
+Необходимые секретные переменные:
+- DOCKER_PASSWORD - пароль от аккаунта Docker Hub
+- DOCKER_USERNAME - username на Docker Hub
+- HOST - ip-адрес удаленного сервера
+- SSH_KEY - закрытый SSH ключ
+- SSH_PASSPHRASE - пароль от SSH ключа
+- TELEGRAM_TO - id в телеграме для отправки сообщения об успешном деплое
+- TELEGRAM_TOKEN - токен бота в телеграме
+- USER - username на удаленном сервере
+
+Пример настройки nginx на удаленном сервере:
 
 ```
-git@github.com:S71LL/foodgram-project-react.git
+server {
+    listen 80;
+    server_name ip_удаленного_сервера;
+
+    location / {
+        proxy_pass http:/127.0.0.1:8000;
+    }
+
+}
+```
+
+### Как развернуть проект локально:
+
+Сделать форк репозитория
+
+Клонировать репозиторий, заменв username на имя пользователя и перейти в него в командной строке:
+
+```
+git clone git@github.com:username/foodgram-project-react.git
 ```
 
 ```
 cd foodgram-project-react
 ```
 
-Создайте файл .env в репозитории:
+Создать файл .env в репозитории и заполнить его:
 
 ```
 touch .env
@@ -18,6 +50,7 @@ touch .env
 
 Пример содержания файла:
 
+```
 POSTGRES_DB=django
 POSTGRES_USER=django_user
 POSTGRES_PASSWORD=mypassword
@@ -27,37 +60,48 @@ DB_PORT=5432
 SECRET_KEY=mysecretkey
 DEBUG=True
 ALLOWED_HOSTS=localhost
+```
 
 Запустите docker compose:
 
 ```
-sudo docker compose -f docker-compose.production.yml up -d
+docker compose -f docker-compose.yml up -d
 ```
 
 Выполнить миграции:
 
 ```
-sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+docker compose -f docker-compose.yml exec backend python manage.py migrate
 ```
 
-Запустите скрипт импорта заготовленных ингредиентов в базу данных:
+Запустить скрипт импорта заготовленных ингредиентов в базу данных:
 
 ```
-sudo docker compose -f docker-compose.production.yml exec backend python manage.py csvimport
+docker compose -f docker-compose.yml exec backend python manage.py csvimport
 ```
 
-Выполните сбор статики:
+Выполнить сбор статики:
 
 ```
-sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+docker compose -f docker-compose.yml exec backend python manage.py collectstatic
 ```
 
-Скопируйте статику в необходимую дерикторию:
+
+Проект доступен локально
+### http://localhost:8000
+
+### Как открыть документацию:
+
+Выполнить клонирование репозитория и перейти в дерикторию foodgram-project-react
+
+Перейти в дерикторию infra и запустить docker compose
 
 ```
-sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+cd infra
+docker compose up
 ```
 
-## https://foodgramproject.myftp.org
+Документация доступна по адресу
+### http://localhost/api/docs/
 
 [![Main foodgram workflow](https://github.com/S71LL/foodgram-project-react/actions/workflows/main.yml/badge.svg)](https://github.com/S71LL/foodgram-project-react/actions/workflows/main.yml)
